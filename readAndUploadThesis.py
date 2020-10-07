@@ -33,18 +33,7 @@ import os
 #Global variables
 
 
-pathToHereMac='/Users/ulysesrico/RespaldoMacUly/quart/appsQuart/appThesisConsole/'
-pathToHereWin=os.getcwd()
-dirquarttestMac=pathToHereMac+'filetest/'
-msg_error="Custom Error"
-thesis_id=[ 'lblTesisBD','lblInstancia','lblFuente','lblLocMesAño','lblEpoca','lblLocPagina','lblTJ','lblRubro','lblTexto','lblPrecedentes']
-thesis_class=['publicacion']
-precedentes_list=['francesa','nota']
-ls_months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
-lim_top_fijo=2021819
-lim_bot_fijo=159803
-thesis_added=False
-
+pathToHere=os.getcwd()
 chromedriver_autoinstaller.install()
 browser=webdriver.Chrome()
 
@@ -115,7 +104,7 @@ def cassandraBDProcess(op,json_thesis,period_num):
     #Connect to Cassandra
     objCC=CassandraConnection()
     cloud_config= {
-        'secure_connect_bundle': pathToHereWin+'\\secure-connect-dbquart.zip'
+        'secure_connect_bundle': pathToHere+'\\secure-connect-dbquart.zip'
     }
     
     auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
