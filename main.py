@@ -35,13 +35,26 @@ if status==200:
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys('Amparo directo')
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
+    #WAit 20 secs until query is loaded.
     time.sleep(20)
     #id de tabla :grdSentencias_ctl00
-    table=browser.find_elements_by_css_selector('table#grdSentencias_ctl00')[0]
-    for row in table.find_elements_by_css_selector('tr'):
-        for cell in row.find_elements_by_tag_name('td'):
-            print(cell.text)
-      
-    #page = BeautifulSoup(browser.page_source, 'lxml')
+    # headers: //*[@id="grdSentencias_ctl00"]/thead/tr[2]
+    #A way to iterate by rows
+    #Every row is:
+    # First page first row:   //*[@id="grdSentencias_ctl00__0"]
+    #Second page first row: //*[@id="grdSentencias_ctl00__0"]
+    #Last row of any page (paged by 20 ): //*[@id="grdSentencias_ctl00__19"]
+    #First row, first column: //*[@id="grdSentencias_ctl00__0"]/td[1]
+
+    for row in range(0,20):
+        for col in range(1,8):
+            if col<7:
+                value=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
+            else:
+                browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')[0].click()
+
+            
+            
+
     browser.quit()
 
