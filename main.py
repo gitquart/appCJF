@@ -51,10 +51,13 @@ if status==200:
             if col<7:
                 value=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
             else:
-                browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')[0].click()
-
-            
-            
-
+                js=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')[0]
+                browser.execute_script('arguments[0].click();',js)
+                #Wait until the second page opens the PDF
+                time.sleep(10)
+                if len(browser.window_handles)>1:
+                    #If the pdf browser page opens, then the record should be done in Cassandra
+                    print('oops')
+                            
     browser.quit()
 
