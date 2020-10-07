@@ -35,7 +35,13 @@ if status==200:
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys('Amparo directo')
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
-    time.sleep(100)
+    time.sleep(20)
+    #id de tabla :grdSentencias_ctl00
+    table=browser.find_elements_by_css_selector('table#grdSentencias_ctl00')[0]
+    for row in table.find_elements_by_css_selector('tr'):
+        for cell in row.find_elements_by_tag_name('td'):
+            print(cell.text)
+      
     #page = BeautifulSoup(browser.page_source, 'lxml')
     browser.quit()
 
