@@ -1,11 +1,13 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.alert import Alert 
-import json
+from selenium import webdriver
 import chromedriver_autoinstaller
 from bs4 import BeautifulSoup
+import json
 import time
 import os
 from cassandra.cluster import Cluster
@@ -28,27 +30,36 @@ options.add_experimental_option("prefs", profile)
 
 chromedriver_autoinstaller.install()
 browser=webdriver.Chrome(options=options)
-browser.delete_all_cookies()
 url="https://sise.cjf.gob.mx/consultasvp/default.aspx"
 
 response= requests.get(url)
 status= response.status_code
 if status==200:
+    
+    browser.get('chrome://settings/clearBrowserData')
+    print('Clearing Browser data...')
+    time.sleep(5)
+    browser.find_element_by_xpath('//settings-ui').send_keys(Keys.ENTER)
     browser.get(url)
     try:
         WebDriverWait(browser, 5).until (EC.alert_is_present())
         #switch_to.alert for switching to alert and accept
         alert = browser.switch_to.alert
         alert.dismiss()
+        browser.refresh()
+        time.sleep(5)
     except TimeoutException:
         print('No alert found!')
         
+    #refresh the page, if the chart is loaded then everthing should work fine (refresh just in case the chart is not loaded yet)
+    browser.refresh()  
+    time.sleep(3)  
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys('Amparo directo')
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
     #WAit 20 secs until query is loaded.
-    time.sleep(20)
+    time.sleep(10)
     #id de tabla :grdSentencias_ctl00
     # headers: //*[@id="grdSentencias_ctl00"]/thead/tr[2]
     #A way to iterate by rows
@@ -63,13 +74,15 @@ if status==200:
             if col<7:
                 value=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
             else:
-                js=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')[0]
-                time.sleep(10)
-                browser.execute_script('arguments[0].click();',js)
+                #This is the xpath of the link : //*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a
+                #This find_element method works!
+                link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
+                link.click()
+                """
                 if len(browser.window_handles)>1:
                     #If the pdf browser page opens, then the record should be done in Cassandra
-                    pdf_window=browser.window_handles[1]
-                    pdf_window.close()
+                    browser.window_handles[1].close()
+                """    
                     
                             
     browser.quit()
