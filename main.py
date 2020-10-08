@@ -14,6 +14,7 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 import requests 
 from cassandra.query import SimpleStatement
+import sys
 
 options = webdriver.ChromeOptions()
 
@@ -30,16 +31,15 @@ options.add_experimental_option("prefs", profile)
 
 chromedriver_autoinstaller.install()
 browser=webdriver.Chrome(options=options)
+browser.get('chrome://settings/clearBrowserData')
+browser.find_element_by_xpath('//settings-ui').send_keys(Keys.ENTER)
+print('Browser data clear...')
+
 url="https://sise.cjf.gob.mx/consultasvp/default.aspx"
 
 response= requests.get(url)
 status= response.status_code
-if status==200:
-    
-    browser.get('chrome://settings/clearBrowserData')
-    print('Clearing Browser data...')
-    time.sleep(5)
-    browser.find_element_by_xpath('//settings-ui').send_keys(Keys.ENTER)
+if status==200:  
     browser.get(url)
     try:
         WebDriverWait(browser, 5).until (EC.alert_is_present())
@@ -47,19 +47,16 @@ if status==200:
         alert = browser.switch_to.alert
         alert.dismiss()
         browser.refresh()
-        time.sleep(5)
     except TimeoutException:
         print('No alert found!')
         
-    #refresh the page, if the chart is loaded then everthing should work fine (refresh just in case the chart is not loaded yet)
-    browser.refresh()  
     time.sleep(3)  
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys('Amparo directo')
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
-    #WAit 20 secs until query is loaded.
-    time.sleep(10)
+    #WAit X secs until query is loaded.
+    time.sleep(15)
     #id de tabla :grdSentencias_ctl00
     # headers: //*[@id="grdSentencias_ctl00"]/thead/tr[2]
     #A way to iterate by rows
@@ -68,7 +65,8 @@ if status==200:
     #Second page first row: //*[@id="grdSentencias_ctl00__0"]
     #Last row of any page (paged by 20 ): //*[@id="grdSentencias_ctl00__19"]
     #First row, first column: //*[@id="grdSentencias_ctl00__0"]/td[1]
-
+    #find_elements_by_xpath will ALWAYS return a list
+    print('Start reading the page...')
     for row in range(0,20):
         for col in range(1,8):
             if col<7:
@@ -78,12 +76,29 @@ if status==200:
                 #This find_element method works!
                 link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
                 link.click()
-                """
+                #The 2nd  window should be opened
+                time.sleep(8)
                 if len(browser.window_handles)>1:
                     #If the pdf browser page opens, then the record should be done in Cassandra
-                    browser.window_handles[1].close()
-                """    
-                    
-                            
-    browser.quit()
+                    main_window=browser.window_handles[0]
+                    print(str(main_window))
+                    pdf_window=browser.window_handles[1]
+                    print(str(pdf_window))
+                    browser.switch_to_window(pdf_window)
+                    #Check the content
+                    #If it has a pdf , then it has : <html><head></head><body></body></html>
+                    #When there is not a PDF, there is a message in the body
+                    """
+                    if browser.find_elements_by_xpath('/html/body')[0]=='':
+                        print('yeap, a pdf')
+                    else:
+                        print('nope, no pdf')  
+                    """      
+                    browser.close()
+                    browser.switch_to_window(main_window)
+                else:
+                    print('Hold it...nothing was opened!') 
+                    sys.exit()   
 
+
+    browser.quit()
