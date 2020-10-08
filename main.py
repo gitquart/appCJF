@@ -13,10 +13,22 @@ from cassandra.auth import PlainTextAuthProvider
 import requests 
 from cassandra.query import SimpleStatement
 
+options = webdriver.ChromeOptions()
+
+download_dir='C:\\Users\\1098350515\\Downloads'
+profile = {"plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewer"}], # Disable Chrome's PDF Viewer
+               "download.default_directory": download_dir , 
+               "download.prompt_for_download": False,
+               "download.directory_upgrade": True,
+               "download.extensions_to_open": "applications/pdf",
+               "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
+               }
+options.add_experimental_option("prefs", profile)
 
 
 chromedriver_autoinstaller.install()
-browser=webdriver.Chrome()
+browser=webdriver.Chrome(options=options)
+browser.delete_all_cookies()
 url="https://sise.cjf.gob.mx/consultasvp/default.aspx"
 
 response= requests.get(url)
@@ -52,12 +64,13 @@ if status==200:
                 value=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
             else:
                 js=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')[0]
-                browser.execute_script('arguments[0].click();',js)
-                #Wait until the second page opens the PDF
                 time.sleep(10)
+                browser.execute_script('arguments[0].click();',js)
                 if len(browser.window_handles)>1:
                     #If the pdf browser page opens, then the record should be done in Cassandra
-                    print('oops')
+                    pdf_window=browser.window_handles[1]
+                    pdf_window.close()
+                    
                             
     browser.quit()
 
