@@ -15,6 +15,7 @@ from cassandra.auth import PlainTextAuthProvider
 import requests 
 from cassandra.query import SimpleStatement
 import sys
+import PyPDF2
 
 options = webdriver.ChromeOptions()
 
@@ -53,7 +54,8 @@ if status==200:
     time.sleep(3)  
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
-    txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys('Amparo directo')
+    strSearch='Ampara directo'
+    txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys(strSearch)
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
     #WAit X secs until query is loaded.
     time.sleep(15)
@@ -76,29 +78,42 @@ if status==200:
                 #This find_element method works!
                 link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
                 link.click()
-                #The 2nd  window should be opened
+                #The 2nd  window should be opened, then I know
                 time.sleep(8)
                 if len(browser.window_handles)>1:
+                    #window_handles changes always
                     #If the pdf browser page opens, then the record should be done in Cassandra
                     main_window=browser.window_handles[0]
-                    print(str(main_window))
                     pdf_window=browser.window_handles[1]
-                    print(str(pdf_window))
                     browser.switch_to_window(pdf_window)
-                    #Check the content
-                    #If it has a pdf , then it has : <html><head></head><body></body></html>
-                    #When there is not a PDF, there is a message in the body
-                    """
-                    if browser.find_elements_by_xpath('/html/body')[0]=='':
-                        print('yeap, a pdf')
-                    else:
-                        print('nope, no pdf')  
-                    """      
+                    #Check if a pdf exists
+                    for file in os.listdir(download_dir):
+                        strFile=file.split('.')[1]
+                        if strFile=='PDF' or strFile=='pdf':
+                            pdfFileObj = open(download_dir+'\\'+file, 'rb')
+                            pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+                            pags=pdfReader.numPages
+                            strFile=''
+                            for x in range(0,pags):
+                                pageObj = pdfReader.getPage(x)
+                                strContent=pageObj.extractText()
+                                strFile=strFile+strContent
+
+                            pdfFileObj.close()   
+                            
+                              
+                    #When pdf is done and the record is in cassandra, delete all files in download folder
+                    for file in os.listdir(download_dir):
+                        os.remove(download_dir+'\\'+file)
+
+
+                                
                     browser.close()
                     browser.switch_to_window(main_window)
                 else:
-                    print('Hold it...nothing was opened!') 
-                    sys.exit()   
-
+                    print('Hold it...nothing was opened!...Search: ',strSearch)
+                    sys.exit(0)
+                        
+     
 
     browser.quit()
