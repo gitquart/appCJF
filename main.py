@@ -103,7 +103,7 @@ if status==200:
                     with open('json_sentencia.json') as json_file:
                         json_sentencia = json.load(json_file)
 
-                    json_sentencia['id']=uuid.uuid4()
+                    json_sentencia['id']=uuid.UUID()
                     json_sentencia['filenumber']=fileNumber
                     json_sentencia['filetype']=filetype
                     json_sentencia['jurisdictionalreviewer']=juris_rev
