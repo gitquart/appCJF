@@ -22,9 +22,9 @@ def cassandraBDProcess(json_sentencia):
     session.default_timeout=70
     row=''
     fileNumber=json_sentencia['filenumber']
-    date=json_sentencia['publication_datetime']
     #Check wheter or not the record exists, check by numberFile and date
-    querySt="select id from thesis.tbcourtdecisioncjf where filenumber='"+str(fileNumber)+"' and publication_datetime='"+date+"' ALLOW FILTERING"
+    #Date in cassandra 2020-09-10T00:00:00.000+0000
+    querySt="select id from thesis.tbcourtdecisioncjf where filenumber='"+str(fileNumber)+"'  ALLOW FILTERING"
                 
     future = session.execute_async(querySt)
     row=future.result()

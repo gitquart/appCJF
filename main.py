@@ -70,7 +70,7 @@ if status==200:
     #First row, first column: //*[@id="grdSentencias_ctl00__0"]/td[1]
     #find_elements_by_xpath will ALWAYS return a list
     #Get the page value and next click button
-    btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0]
+    
     PageTotal=int(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00_ctl03_ctl01_PageSizeComboBox_Input"]').get_attribute('value'))
     infoPag=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text
     data=infoPag.split(' ')
@@ -118,9 +118,10 @@ if status==200:
                         json_sentencia['filetype']=filetype
                         json_sentencia['jurisdictionalreviewer']=juris_rev
                         # timestamp accepted for cassandra: yyyy-mm-dd 
-                        dateStr=date.split('/') #0:month,1:day,2:year
-                        dtDate=dateStr[2]+'-'+dateStr[0]+'-'+dateStr[1]
-                        json_sentencia['publication_datetime']=dtDate
+                        #In web site, the date comes as day-month-year
+                        dateStr=date.split('/') #0:day,1:month,2:year
+                        dtDate=dateStr[2]+'-'+dateStr[1]+'-'+dateStr[0]
+                        json_sentencia['publication_datetime']='1000-01-01'
                         json_sentencia['strpublicationdatetime']=dtDate
                         json_sentencia['subject']=subject
                         json_sentencia['summary']=summary    
@@ -164,7 +165,7 @@ if status==200:
                     else:
                         print('Hold it...nothing was opened!...Search: ',strSearch)
                         sys.exit(0)
-        btnnext.click()                
+        btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0].click()               
      
 
     browser.quit()
