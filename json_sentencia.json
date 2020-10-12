@@ -3,8 +3,8 @@
   "filenumber": "",
   "filetype":"",
   "jurisdictionalreviewer":"",
-  "pdfcontent":"",
-  "publication_datetime":"",
+  "lspdfcontent":"",
+  "publication_datetime":[],
   "strpublicationdatetime":"",
   "subject":"",
   "summary":""

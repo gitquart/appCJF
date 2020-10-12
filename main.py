@@ -130,6 +130,7 @@ if status==200:
 
 
                         #Check if a pdf exists
+                        lsContent=[]
                         for file in os.listdir(download_dir):
                             pdfDownloaded=True
                             strFile=file.split('.')[1]
@@ -137,23 +138,23 @@ if status==200:
                                 pdfFileObj = open(download_dir+'\\'+file, 'rb')
                                 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
                                 pags=pdfReader.numPages
-                                strFile=''
                                 for x in range(0,pags):
                                     pageObj = pdfReader.getPage(x)
                                     strContent=pageObj.extractText()
-                                    strFile=strFile+strContent
+                                    lsContent.append(strContent)
 
                                 pdfFileObj.close()   
 
                          
                         #When pdf is done and the record is in cassandra, delete all files in download folder
                         #If the pdf is not downloaded but the window is open, save the data without pdf
+                        json_sentencia['lspdfcontent'].clear()
                         if pdfDownloaded==True:
-                            json_sentencia['pdfcontent']=strFile
+                            json_sentencia['lspdfcontent'].append(lsContent)
                             for file in os.listdir(download_dir):
                                 os.remove(download_dir+'\\'+file) 
                         else:
-                            json_sentencia['pdfcontent']=''
+                            json_sentencia['lspdfcontent'].clear()
 
                         #Insert information to cassandra
                         res=bd.cassandraBDProcess(json_sentencia)
