@@ -55,11 +55,11 @@ if status==200:
 
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
-    strSearch='Ampara directo'
+    strSearch='Amparo directo'
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys(strSearch)
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
     #WAit X secs until query is loaded.
-    time.sleep(15)
+    time.sleep(10)
     #id de tabla :grdSentencias_ctl00
     # headers: //*[@id="grdSentencias_ctl00"]/thead/tr[2]
     #A way to iterate by rows
@@ -79,6 +79,8 @@ if status==200:
 
     print('Start reading the page...')
     for page in range(1,pagLimit):
+        #Time sleep for the click to change paging
+        time.sleep(3)
         for row in range(0,PageTotal):
             pdfDownloaded=False
             for col in range(1,8):
