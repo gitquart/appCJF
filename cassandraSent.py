@@ -35,7 +35,7 @@ def cassandraBDProcess(json_sentencia):
     else:        
         #Insert Data as JSON
         jsonS=json.dumps(json_sentencia)              
-        insertSt="INSERT INTO thesis.tbthesis JSON '"+jsonS+"';" 
+        insertSt="INSERT INTO thesis.tbcourtdecisioncjf JSON '"+jsonS+"';" 
         future = session.execute_async(insertSt)
         future.result()  
         sent_added=True

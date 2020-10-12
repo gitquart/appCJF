@@ -52,6 +52,7 @@ if status==200:
         print('No alert found!')
         
     time.sleep(3)  
+
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
     strSearch='Ampara directo'
@@ -68,93 +69,102 @@ if status==200:
     #Last row of any page (paged by 20 ): //*[@id="grdSentencias_ctl00__19"]
     #First row, first column: //*[@id="grdSentencias_ctl00__0"]/td[1]
     #find_elements_by_xpath will ALWAYS return a list
+    #Get the page value and next click button
+    btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0]
+    PageTotal=int(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00_ctl03_ctl01_PageSizeComboBox_Input"]').get_attribute('value'))
+    infoPag=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text
+    data=infoPag.split(' ')
+    data=data[4].split(',')
+    pagLimit=int(data[0])+1
+
     print('Start reading the page...')
-    for row in range(0,20):
-        pdfDownloaded=False
-        for col in range(1,8):
-            if col<7:
-                if col==1:
-                    juris_rev=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
-                if col==2:
-                    filetype=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
-                if col==3:
-                    subject=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
-                if col==4:
-                    fileNumber=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
-                if col==5:
-                    summary=summary=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
-                if col==6:
-                    date=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text                    
+    for page in range(1,pagLimit):
+        for row in range(0,PageTotal):
+            pdfDownloaded=False
+            for col in range(1,8):
+                if col<7:
+                    if col==1:
+                        juris_rev=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
+                    if col==2:
+                        filetype=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
+                    if col==3:
+                        subject=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
+                    if col==4:
+                        fileNumber=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
+                    if col==5:
+                        summary=summary=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
+                    if col==6:
+                        date=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text                    
 
-            else:
-                #This is the xpath of the link : //*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a
-                #This find_element method works!
-                link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
-                link.click()
-                #The 2nd  window should be opened, then I know
-                time.sleep(8)
-                if len(browser.window_handles)>1:
-                    #window_handles changes always
-                    #If the pdf browser page opens, then the record should be done in Cassandra
-                    main_window=browser.window_handles[0]
-                    pdf_window=browser.window_handles[1]
-                    browser.switch_to_window(pdf_window)
+                else:
+                    #This is the xpath of the link : //*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a
+                    #This find_element method works!
+                    link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
+                    link.click()
+                    #The 2nd  window should be opened, then I know
+                    time.sleep(8)
+                    if len(browser.window_handles)>1:
+                        #window_handles changes always
+                        #If the pdf browser page opens, then the record should be done in Cassandra
+                        main_window=browser.window_handles[0]
+                        pdf_window=browser.window_handles[1]
+                        browser.switch_to_window(pdf_window)
                     
-                    with open('json_sentencia.json') as json_file:
-                        json_sentencia = json.load(json_file)
+                        with open('json_sentencia.json') as json_file:
+                            json_sentencia = json.load(json_file)
 
-                    json_sentencia['id']=uuid.UUID()
-                    json_sentencia['filenumber']=fileNumber
-                    json_sentencia['filetype']=filetype
-                    json_sentencia['jurisdictionalreviewer']=juris_rev
-                    # timestamp accepted for cassandra: yyyy-mm-dd 
-                    dateStr=date.split('/') #0:month,1:day,2:year
-                    dtDate=dateStr[2]+'-'+dateStr[0]+'-'+dateStr[1]
-                    json_sentencia['publication_datetime']=dtDate
-                    json_sentencia['strpublicationdatetime']=dtDate
-                    json_sentencia['subject']=subject
-                    json_sentencia['summary']=summary    
+                        json_sentencia['id']=str(uuid.uuid4())
+                        json_sentencia['filenumber']=fileNumber
+                        json_sentencia['filetype']=filetype
+                        json_sentencia['jurisdictionalreviewer']=juris_rev
+                        # timestamp accepted for cassandra: yyyy-mm-dd 
+                        dateStr=date.split('/') #0:month,1:day,2:year
+                        dtDate=dateStr[2]+'-'+dateStr[0]+'-'+dateStr[1]
+                        json_sentencia['publication_datetime']=dtDate
+                        json_sentencia['strpublicationdatetime']=dtDate
+                        json_sentencia['subject']=subject
+                        json_sentencia['summary']=summary    
 
 
-                    #Check if a pdf exists
-                    for file in os.listdir(download_dir):
-                        pdfDownloaded=True
-                        strFile=file.split('.')[1]
-                        if strFile=='PDF' or strFile=='pdf':
-                            pdfFileObj = open(download_dir+'\\'+file, 'rb')
-                            pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-                            pags=pdfReader.numPages
-                            strFile=''
-                            for x in range(0,pags):
-                                pageObj = pdfReader.getPage(x)
-                                strContent=pageObj.extractText()
-                                strFile=strFile+strContent
+                        #Check if a pdf exists
+                        for file in os.listdir(download_dir):
+                            pdfDownloaded=True
+                            strFile=file.split('.')[1]
+                            if strFile=='PDF' or strFile=='pdf':
+                                pdfFileObj = open(download_dir+'\\'+file, 'rb')
+                                pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+                                pags=pdfReader.numPages
+                                strFile=''
+                                for x in range(0,pags):
+                                    pageObj = pdfReader.getPage(x)
+                                    strContent=pageObj.extractText()
+                                    strFile=strFile+strContent
 
-                            pdfFileObj.close()   
+                                pdfFileObj.close()   
 
                          
-                    #When pdf is done and the record is in cassandra, delete all files in download folder
-                    #If the pdf is not downloaded but the window is open, save the data without pdf
-                    if pdfDownloaded==True:
-                        json_sentencia['pdfcontent']=strFile
-                        for file in os.listdir(download_dir):
-                            os.remove(download_dir+'\\'+file) 
-                    else:
-                        json_sentencia['pdfcontent']=''
+                        #When pdf is done and the record is in cassandra, delete all files in download folder
+                        #If the pdf is not downloaded but the window is open, save the data without pdf
+                        if pdfDownloaded==True:
+                            json_sentencia['pdfcontent']=strFile
+                            for file in os.listdir(download_dir):
+                                os.remove(download_dir+'\\'+file) 
+                        else:
+                            json_sentencia['pdfcontent']=''
 
-                    #Insert information to cassandra
-                    res=bd.cassandraBDProcess(json_sentencia)
-                    if res:
-                        print('Sentencia added...')
-                    else:
-                        print('Something when wrong with cassandra')    
+                        #Insert information to cassandra
+                        res=bd.cassandraBDProcess(json_sentencia)
+                        if res:
+                            print('Sentencia added...')
+                        else:
+                            print('Keep going...sentencia existed')    
 
-                    browser.close()
-                    browser.switch_to_window(main_window)
-                else:
-                    print('Hold it...nothing was opened!...Search: ',strSearch)
-                    sys.exit(0)
-                        
+                        browser.close()
+                        browser.switch_to_window(main_window)
+                    else:
+                        print('Hold it...nothing was opened!...Search: ',strSearch)
+                        sys.exit(0)
+        btnnext.click()                
      
 
     browser.quit()
