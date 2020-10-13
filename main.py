@@ -138,16 +138,7 @@ if status==200:
                             pdfDownloaded=True
                             strFile=file.split('.')[1]
                             if strFile=='PDF' or strFile=='pdf':
-                                pdfFileObj = open(download_dir+'\\'+file, 'rb')
-                                pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-                                pags=pdfReader.numPages
-                                for x in range(0,pags):
-                                    pageObj = pdfReader.getPage(x)
-                                    strContent=pageObj.extractText().decode('UTF-8')
-                                    lsSentencia.append(str(strContent))
-
-                                pdfFileObj.close()
-                            
+                                text = textract.process(download_dir+'\\'+file, encoding='utf_8')
                             for text in lsSentencia:
                                 json_sentencia['lspdfcontent'].append(str(text))        
                             
@@ -175,3 +166,16 @@ if status==200:
      
 
     browser.quit()
+
+    """
+     pdfFileObj = open(download_dir+'\\'+file, 'rb')
+                                pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+                                pags=pdfReader.numPages
+                                for x in range(0,pags):
+                                    pageObj = pdfReader.getPage(x)
+                                    strContent=pageObj.extractText().decode('UTF-8')
+                                    lsSentencia.append(str(strContent))
+
+                                pdfFileObj.close()
+
+    """                            
