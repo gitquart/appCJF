@@ -102,8 +102,8 @@ if status==200:
                 else:
                     #This is the xpath of the link : //*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a
                     #This find_element method works!
-                    link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
-                    link.click()
+                    #link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
+                    #link.click()
                     #The 2nd  window should be opened, then I know
                     time.sleep(8)
                     if len(browser.window_handles)>1:
@@ -139,7 +139,16 @@ if status==200:
                             pdfDownloaded=True
                             strFile=file.split('.')[1]
                             if strFile=='PDF' or strFile=='pdf':
-                                text = textract.process(download_dir+'\\'+file, encoding='utf_8')
+                                pdfFileObj = open(download_dir+'\\'+file, 'rb')
+                                pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+                                pags=pdfReader.numPages
+                                for x in range(0,pags):
+                                    pageObj = pdfReader.getPage(x)
+                                    strContent=pageObj.extractText().decode('UTF-8')
+                                    lsSentencia.append(str(strContent))
+
+                                pdfFileObj.close()
+                               
                             for text in lsSentencia:
                                 json_sentencia['lspdfcontent'].append(str(text))        
                             
@@ -169,14 +178,6 @@ if status==200:
     browser.quit()
 
     """
-     pdfFileObj = open(download_dir+'\\'+file, 'rb')
-                                pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-                                pags=pdfReader.numPages
-                                for x in range(0,pags):
-                                    pageObj = pdfReader.getPage(x)
-                                    strContent=pageObj.extractText().decode('UTF-8')
-                                    lsSentencia.append(str(strContent))
-
-                                pdfFileObj.close()
+     
 
     """                            
