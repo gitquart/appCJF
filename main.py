@@ -7,6 +7,7 @@ from selenium.webdriver.common.alert import Alert
 from selenium import webdriver
 import chromedriver_autoinstaller
 import json
+import textract
 import time
 import os
 import requests 
@@ -59,7 +60,7 @@ if status==200:
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys(strSearch)
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
     #WAit X secs until query is loaded.
-    time.sleep(10)
+    time.sleep(20)
     #id de tabla :grdSentencias_ctl00
     # headers: //*[@id="grdSentencias_ctl00"]/thead/tr[2]
     #A way to iterate by rows
