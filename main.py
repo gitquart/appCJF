@@ -130,7 +130,10 @@ if status==200:
 
 
                         #Check if a pdf exists
-                        lsContent=[]
+                        json_sentencia['lspdfcontent'].clear()
+                        strContent=''
+                        fileC=''
+                        lsSentencia=[]
                         for file in os.listdir(download_dir):
                             pdfDownloaded=True
                             strFile=file.split('.')[1]
@@ -140,21 +143,21 @@ if status==200:
                                 pags=pdfReader.numPages
                                 for x in range(0,pags):
                                     pageObj = pdfReader.getPage(x)
-                                    strContent=pageObj.extractText()
-                                    lsContent.append(strContent)
+                                    strContent=pageObj.extractText().decode('UTF-8')
+                                    lsSentencia.append(str(strContent))
 
-                                pdfFileObj.close()   
+                                pdfFileObj.close()
+                            
+                            for text in lsSentencia:
+                                json_sentencia['lspdfcontent'].append(str(text))        
+                            
 
-                         
                         #When pdf is done and the record is in cassandra, delete all files in download folder
                         #If the pdf is not downloaded but the window is open, save the data without pdf
-                        json_sentencia['lspdfcontent'].clear()
                         if pdfDownloaded==True:
-                            json_sentencia['lspdfcontent'].append(lsContent)
+                            #json_sentencia['lspdfcontent']=fileC
                             for file in os.listdir(download_dir):
                                 os.remove(download_dir+'\\'+file) 
-                        else:
-                            json_sentencia['lspdfcontent'].clear()
 
                         #Insert information to cassandra
                         res=bd.cassandraBDProcess(json_sentencia)
