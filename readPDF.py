@@ -35,9 +35,11 @@ for file in os.listdir(download_dir):
         pags=pdfReader.numPages
         for x in range(0,pags):
             pageObj = pdfReader.getPage(x)
-            strContent=pageObj.extractText().decode('UTF-8')
-            lsSentencia.append(str(strContent))
+            strContent=pageObj.extractText()
+            fileC=fileC+strContent
 
         pdfFileObj.close()
-    for text in lsSentencia:
-        json_sentencia['lspdfcontent'].append(str(text)) 
+
+
+  
+

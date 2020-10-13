@@ -102,8 +102,8 @@ if status==200:
                 else:
                     #This is the xpath of the link : //*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a
                     #This find_element method works!
-                    #link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
-                    #link.click()
+                    link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
+                    link.click()
                     #The 2nd  window should be opened, then I know
                     time.sleep(8)
                     if len(browser.window_handles)>1:
@@ -134,7 +134,7 @@ if status==200:
                         json_sentencia['lspdfcontent'].clear()
                         strContent=''
                         fileC=''
-                        lsSentencia=[]
+                        lsWords=[]
                         for file in os.listdir(download_dir):
                             pdfDownloaded=True
                             strFile=file.split('.')[1]
@@ -144,19 +144,19 @@ if status==200:
                                 pags=pdfReader.numPages
                                 for x in range(0,pags):
                                     pageObj = pdfReader.getPage(x)
-                                    strContent=pageObj.extractText().decode('UTF-8')
-                                    lsSentencia.append(str(strContent))
+                                    strContent=pageObj.extractText().replace('\n',' ')
+                                    lsWords.append(strContent.split())
+                                    
 
                                 pdfFileObj.close()
-                               
-                            for text in lsSentencia:
-                                json_sentencia['lspdfcontent'].append(str(text))        
+                            for ls in lsWords:
+                                for word in ls:
+                                    json_sentencia['lspdfcontent'].append(word)    
                             
 
                         #When pdf is done and the record is in cassandra, delete all files in download folder
                         #If the pdf is not downloaded but the window is open, save the data without pdf
                         if pdfDownloaded==True:
-                            #json_sentencia['lspdfcontent']=fileC
                             for file in os.listdir(download_dir):
                                 os.remove(download_dir+'\\'+file) 
 
