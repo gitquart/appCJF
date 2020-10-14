@@ -30,7 +30,9 @@ profile = {"plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewe
                "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
                }
 options.add_experimental_option("prefs", profile)
-
+#Erase every file in download folder at the beginning to avoid mixed files
+for file in os.listdir(download_dir):
+    os.remove(download_dir+'\\'+file)
 
 chromedriver_autoinstaller.install()
 browser=webdriver.Chrome(options=options)
@@ -57,7 +59,7 @@ if status==200:
 
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
-    strSearch='Amparo directo'
+    strSearch='Primer'
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys(strSearch)
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
     #WAit X secs until query is loaded.
@@ -133,8 +135,9 @@ if status==200:
 
                         #Check if a pdf exists
                        
-                        strContent=''
-                        fileC=''
+                        json_sentencia['lspdfcontent'].clear()
+                        lsText=[]
+                        lsWords=[]
                         for file in os.listdir(download_dir):
                             pdfDownloaded=True
                             strFile=file.split('.')[1]
@@ -144,15 +147,29 @@ if status==200:
                                 pags=pdfReader.numPages
                                 for x in range(0,pags):
                                     pageObj = pdfReader.getPage(x)
-                                    strContent=pageObj.extractText().encode('UTF-8')
-                                    tool.appendInfoToFile(download_dir+'\\','temp.txt',str(strContent))
-                                    
-
+                                    lsText.append(str(pageObj.extractText().encode('utf-8')))
+                                    #tool.appendInfoToFile(download_dir+'\\','temp.txt',str(strContent))                             
                                 pdfFileObj.close()
-                         
+
+                            #Clean all the list of words
+                            for content in lsText:
+                                lsWords.append(content.split())
+                            
+                            lsCleanWord=[]
+                            for word in lsWords:
+                                lsCleanWord.append(str(word).replace("b'"," "))
+                            lsCleanWord2=[]
+                            for word in lsCleanWord:
+                                lsCleanWord2.append(str(word).replace("\'"," "))    
+                            lsCleanWord3=[]
+                            for word in lsCleanWord2:
+                                lsCleanWord3.append(str(word).replace("\n"," "))  
+                                             
                         #When pdf is done and the record is in cassandra, delete all files in download folder
                         #If the pdf is not downloaded but the window is open, save the data without pdf
                         if pdfDownloaded==True:
+                            for word in lsCleanWord3:
+                                json_sentencia['lspdfcontent'].append(word)
                             for file in os.listdir(download_dir):
                                 os.remove(download_dir+'\\'+file) 
 
@@ -167,13 +184,10 @@ if status==200:
                         browser.switch_to_window(main_window)
                     else:
                         print('Hold it...nothing was opened!...Search: ',strSearch)
+                        browser.quit()
                         sys.exit(0)
         btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0].click()               
      
 
     browser.quit()
-
-    """
-     
-
-    """                            
+                           
