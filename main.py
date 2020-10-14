@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.alert import Alert 
 from selenium import webdriver
+import utils as tool
 import chromedriver_autoinstaller
 import json
 import textract
@@ -131,10 +132,9 @@ if status==200:
 
 
                         #Check if a pdf exists
-                        json_sentencia['lspdfcontent'].clear()
+                       
                         strContent=''
                         fileC=''
-                        lsWords=[]
                         for file in os.listdir(download_dir):
                             pdfDownloaded=True
                             strFile=file.split('.')[1]
@@ -144,16 +144,12 @@ if status==200:
                                 pags=pdfReader.numPages
                                 for x in range(0,pags):
                                     pageObj = pdfReader.getPage(x)
-                                    strContent=pageObj.extractText().replace('\n',' ')
-                                    lsWords.append(strContent.split())
+                                    strContent=pageObj.extractText().encode('UTF-8')
+                                    tool.appendInfoToFile(download_dir+'\\','temp.txt',str(strContent))
                                     
 
                                 pdfFileObj.close()
-                            for ls in lsWords:
-                                for word in ls:
-                                    json_sentencia['lspdfcontent'].append(word)    
-                            
-
+                         
                         #When pdf is done and the record is in cassandra, delete all files in download folder
                         #If the pdf is not downloaded but the window is open, save the data without pdf
                         if pdfDownloaded==True:
