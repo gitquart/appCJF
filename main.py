@@ -40,6 +40,9 @@ browser=webdriver.Chrome(options=options)
 browser.get('chrome://settings/clearBrowserData')
 browser.find_element_by_xpath('//settings-ui').send_keys(Keys.ENTER)
 print('Browser data clear...')
+print('Write a topic:')
+topic=input()
+print('Code looking for:',str(topic))
 
 url="https://sise.cjf.gob.mx/consultasvp/default.aspx"
 
@@ -60,7 +63,7 @@ if status==200:
 
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
-    strSearch='Amparo directo'
+    strSearch=str(topic)
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys(strSearch)
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
     #WAit X secs until query is loaded.
@@ -81,6 +84,24 @@ if status==200:
     data=infoPag.split(' ')
     data=data[4].split(',')
     pagLimit=int(data[0])+1
+    #Controls of page:
+    #*********************************
+    #Initial Load
+    #Page 1 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[1]
+    #Page 10 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[10]
+    #Next Page //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]
+    #Prev Page //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[1]/input[2]
+    #After click on 2nd page
+    #Page 1 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[1]
+    #Page 10 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[10]
+    #After click on last page
+    # Page 1 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[2]
+    # Last page //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[2]
+    #Next set of pages //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]
+    #Next set of pages //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]
+    #go=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]')
+    #go.click()
+
 
     print('Start reading the page...')
     for page in range(1,pagLimit):
@@ -99,7 +120,9 @@ if status==200:
                     if col==4:
                         fileNumber=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
                     if col==5:
+                        #I remove (') because some text got it and cassandra failed to insert it
                         summary=summary=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
+                        str(summary).replace("'"," ")
                     if col==6:
                         date=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text                    
 
