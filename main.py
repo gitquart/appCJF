@@ -132,7 +132,7 @@ if status==200:
                     link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
                     link.click()
                     #The 2nd  window should be opened, then I know
-                    time.sleep(13)
+                    time.sleep(20)
                     if len(browser.window_handles)>1:
                         #window_handles changes always
                         #If the pdf browser page opens, then the record should be done in Cassandra
