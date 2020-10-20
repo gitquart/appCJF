@@ -67,7 +67,7 @@ if status==200:
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys(strSearch)
     btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
     #WAit X secs until query is loaded.
-    time.sleep(20)
+    time.sleep(40)
     #id de tabla :grdSentencias_ctl00
     # headers: //*[@id="grdSentencias_ctl00"]/thead/tr[2]
     #A way to iterate by rows
@@ -79,11 +79,11 @@ if status==200:
     #find_elements_by_xpath will ALWAYS return a list
     #Get the page value and next click button
     
-    PageTotal=int(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00_ctl03_ctl01_PageSizeComboBox_Input"]').get_attribute('value'))
-    infoPag=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text
-    data=infoPag.split(' ')
-    data=data[4].split(',')
-    pagLimit=int(data[0])+1
+    #PageTotal=int(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00_ctl03_ctl01_PageSizeComboBox_Input"]').get_attribute('value'))
+    #infoPag=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text
+    #data=infoPag.split(' ')
+    #data=data[4].split(',')
+    #pagLimit=int(data[0])+1
     #Controls of page:
     #*********************************
     #Initial Load
@@ -104,10 +104,10 @@ if status==200:
 
 
     print('Start reading the page...')
-    for page in range(1,pagLimit):
+    for page in range(1,100):
         #Time sleep for the click to change paging
         time.sleep(3)
-        for row in range(0,PageTotal):
+        for row in range(0,20):
             pdfDownloaded=False
             for col in range(1,8):
                 if col<7:
@@ -200,9 +200,9 @@ if status==200:
                         #Insert information to cassandra
                         res=bd.cassandraBDProcess(json_sentencia)
                         if res:
-                            print('Sentencia added...')
+                            print('Sentencia added:',str(fileNumber))
                         else:
-                            print('Keep going...sentencia existed')    
+                            print('Keep going...sentencia existed:',str(fileNumber))    
 
                         browser.close()
                         browser.switch_to_window(main_window)
