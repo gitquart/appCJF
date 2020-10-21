@@ -154,7 +154,7 @@ if status==200:
                         json_sentencia['publication_datetime']='1000-01-01'
                         json_sentencia['strpublicationdatetime']=dtDate
                         json_sentencia['subject']=subject
-                        json_sentencia['summary']=summary    
+                        json_sentencia['summary']=str(summary).replace("'"," ")    
 
 
                         #Check if a pdf exists

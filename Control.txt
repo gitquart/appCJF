@@ -1,8 +1,10 @@
 Control de consulta y página
 
 Consulta, Página
-Tercer circuito, 17,26
+Tercer circuito, 17,33
 2017, 100
 
 
-Sent. so far: 841
+Sent. so far:
+ 841 , 20 oct 2020
+     , 21 oct 2020
