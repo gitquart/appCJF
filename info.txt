@@ -1,0 +1,35 @@
+ #id de tabla :grdSentencias_ctl00
+    # headers: //*[@id="grdSentencias_ctl00"]/thead/tr[2]
+    #A way to iterate by rows
+    #Every row is:
+    # First page first row:   //*[@id="grdSentencias_ctl00__0"]
+    #Second page first row: //*[@id="grdSentencias_ctl00__0"]
+    #Last row of any page (paged by 20 ): //*[@id="grdSentencias_ctl00__19"]
+    #First row, first column: //*[@id="grdSentencias_ctl00__0"]/td[1]
+    #find_elements_by_xpath will ALWAYS return a list
+    #Get the page value and next click button
+    
+    #PageTotal=int(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00_ctl03_ctl01_PageSizeComboBox_Input"]').get_attribute('value'))
+    #infoPag=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text
+    #data=infoPag.split(' ')
+    #data=data[4].split(',')
+    #pagLimit=int(data[0])+1
+    #Controls of page:
+    #*********************************
+    #Initial Load
+    #Page 1 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[1]
+    #Page 10 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[10]
+    #Next Page //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]
+    #Prev Page //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[1]/input[2]
+    #After click on 2nd page
+    #Page 1 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[1]
+    #Page 10 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[10]
+    #After click on last page
+    # Page 1 //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[2]
+    # Last page //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[2]
+    #Next set of pages //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]
+    #Next set of pages in page 1 (Right ...) //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]
+    #Next set of pages from page 2 (Right ...)  //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]
+    #Prior set of pages from page 2 to 100 (Left ...) //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[1]
+
+    //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]/strong[1]
