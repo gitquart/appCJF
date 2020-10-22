@@ -57,12 +57,11 @@ if status==200:
         
     time.sleep(3)  
     #Read the information of query and page
-    with open("app_control.txt", "r") as file:
-        first_line = file.readline()
-
-    info=first_line.split(',')
-    topic=str(info[0])
-    startPage=int(info[1])
+    with open('json_control.json') as json_file:
+        json_control = json.load(json_file)
+    
+    topic=json_control['query']
+    startPage=int(json_control['pag'])
 
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
@@ -73,24 +72,11 @@ if status==200:
     time.sleep(20)
     if startPage<=10:
         #Mechanism no failure
-        SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
-        time.sleep(2)
         btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
-        time.sleep(2)
-        SectionPriorPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[1]")[0].click()
         #End of non failire mechanism
-    if startPage==100:
-        #This means it's the page 100
-        for times in range(1,11):
-            if times==1:
-                SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
-                btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
-            else:
-                SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]")[0].click()
-                btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
-    
-    if startPage>10 and startPage<100:
-        ten=info[1]
+
+    if startPage>10 and startPage<=100:
+        ten=str(startPage)
         ten=int(ten[0])+1
         for times in range(1,ten):
             if times==1:
@@ -110,6 +96,7 @@ if status==200:
     #Control the page
     #Page identention
     while (startPage<=100):
+        print('Currently on page:',str(startPage),'with query:',str(topic))
         countRow=0
         for row in range(0,20):
             pdfDownloaded=False
@@ -199,7 +186,8 @@ if status==200:
                                 os.remove(download_dir+'\\'+file) 
 
                         #Insert information to cassandra
-                        res=bd.cassandraBDProcess(json_sentencia)
+                        #res=bd.cassandraBDProcess(json_sentencia)
+                        res=True
                         if res:
                             print('Sentencia added:',str(fileNumber))
                         else:
@@ -215,19 +203,26 @@ if status==200:
                         sys.exit(0)       
 
         #Page identention
-        print('Count of Rows:',str(countRow))    
-        btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0].click()   
+        print('Count of Rows:',str(countRow)) 
         #Update the info in file
         infoPage=str(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text)
-        infoPage.split(' ')
-        currentPage=int(infoPage[1])
-        with open("app_control.txt", "r") as file: 
-            list_of_lines = file.readlines()
-            line1=list_of_lines[0]
-            info=line1.split(',')
-            strTopic=info[0]
-            control_page=int(currentPage)+1
-            list_of_lines[0]=strTopic+','+str(control_page)
+        data=infoPage.split(' ')
+        currentPage=int(data[2])
+        print('Page already done:...',str(currentPage))   
+        control_page=int(currentPage)+1
+        startPage=control_page
+        #Edit json control file
+        json_file=open('json_control.json','r')
+        json_control = json.load(json_file)
+        json_file.close()
+        json_control['pag']=control_page
+        json_file=open('json_control.json','w')
+        json.dump(json_control, json_file)
+        json_file.close()
+        #Change the page with next
+        btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0].click()
+        time.sleep(5) 
+        #btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()  
 
 browser.quit()
                            
