@@ -62,8 +62,6 @@ if status==200:
 
     info=first_line.split(',')
     topic=str(info[0])
-    ten=info[1]
-    ten=int(ten[0])
     startPage=int(info[1])
 
     #class names for li: rtsLI rtsLast
@@ -74,7 +72,7 @@ if status==200:
     #WAit X secs until query is loaded.
     time.sleep(40)
 
-    if ten<=10:
+    if startPage<=10:
         #Mechanism no failure
         SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
         time.sleep(2)
@@ -82,15 +80,27 @@ if status==200:
         time.sleep(2)
         SectionPriorPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[1]")[0].click()
         #End of non failire mechanism
-    if ten==0:
+    if startPage==100:
         #This means it's the page 100
         for times in range(1,11):
             if times==1:
-                SectionNextPages=browser.find_elements_by_xpath("//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
+                SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
                 btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
             else:
-                SectionNextPages=browser.find_elements_by_xpath("//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]")[0].click()
+                SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]")[0].click()
                 btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
+    
+    if startPage>10 and startPage<100:
+        ten=info[1]
+        ten=int(ten[0])+1
+        for times in range(1,ten):
+            if times==1:
+                SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
+                btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
+            else:
+                SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]")[0].click()
+                btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
+
 
     print('Start reading the page...')
     for row in range(0,20):
