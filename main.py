@@ -76,8 +76,11 @@ if status==200:
         #End of non failire mechanism
 
     if startPage>10 and startPage<=100:
-        ten=str(startPage)
-        ten=int(ten[0])+1
+        if startPage>90:
+            ten=10
+        else:    
+            ten=str(startPage)
+            ten=int(ten[0])+1
         for times in range(1,ten):
             if times==1:
                 SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
@@ -97,6 +100,10 @@ if status==200:
     #Page identention
     while (startPage<=100):
         print('Currently on page:',str(startPage),'with query:',str(topic))
+        json_file=open('json_control.json','r')
+        json_control = json.load(json_file)
+        jsonPag=json_control['pag']
+        print('Page from json control:',str(jsonPag))
         countRow=0
         for row in range(0,20):
             pdfDownloaded=False
@@ -137,6 +144,11 @@ if status==200:
 
                         json_sentencia['id']=str(uuid.uuid4())
                         json_sentencia['filenumber']=fileNumber
+                        data=''
+                        data=fileNumber.split('/')
+                        year=0
+                        year=int(data[1])
+                        json_sentencia['year']=year
                         json_sentencia['filetype']=filetype
                         json_sentencia['jurisdictionalreviewer']=juris_rev
                         # timestamp accepted for cassandra: yyyy-mm-dd 
@@ -186,8 +198,8 @@ if status==200:
                                 os.remove(download_dir+'\\'+file) 
 
                         #Insert information to cassandra
-                        #res=bd.cassandraBDProcess(json_sentencia)
-                        res=True
+                        res=bd.cassandraBDProcess(json_sentencia)
+                        #res=True
                         if res:
                             print('Sentencia added:',str(fileNumber))
                         else:

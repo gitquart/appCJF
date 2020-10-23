@@ -19,7 +19,7 @@ def main():
     row=''
     print('Getting all sent...')
        
-    querySt="select * from thesis.tbcourtdecisioncjf"   
+    querySt="select id from thesis.tbcourtdecisioncjf"   
         
     count=0
     statement = SimpleStatement(querySt, fetch_size=1000)
