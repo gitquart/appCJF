@@ -181,29 +181,11 @@ if status==200:
                                     contFile=contFile+str(cont64)
                                     #lsText.append(str(pageObj.extractText().encode('ascii')))                            
                                 pdfFileObj.close()
-                            """
-                            #Clean all the list of words
-                            for content in lsText:
-                                lsWords.append(content.split())
-                            
-                            lsCleanWord=[]
-                            for word in lsWords:
-                                lsCleanWord.append(str(word).replace("b'"," "))
-                            lsCleanWord2=[]
-                            for word in lsCleanWord:
-                                lsCleanWord2.append(str(word).replace("\'"," "))    
-                            lsCleanWord3=[]
-                            for word in lsCleanWord2:
-                                lsCleanWord3.append(str(word).replace("\n"," "))  
-                            """       
-                                             
+                           
                         #When pdf is done and the record is in cassandra, delete all files in download folder
                         #If the pdf is not downloaded but the window is open, save the data without pdf
                         if pdfDownloaded==True:
-                            """
-                            for word in lsCleanWord3:
-                                json_sentencia['lspdfcontent'].append(word)
-                            """
+                          
                             json_sentencia['pdfcontent']=contFile.replace("b'"," ").replace("\'"," ")
                             for file in os.listdir(download_dir):
                                 os.remove(download_dir+'\\'+file) 
@@ -221,7 +203,7 @@ if status==200:
                         browser.switch_to_window(main_window)    
 
                     else:
-                        print('Hold it...nothing was opened!...Search: ',strSearch)
+                        print('The pdf window was not opened',strSearch)
                         browser.quit()
                         sys.exit(0)       
 
