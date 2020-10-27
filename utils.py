@@ -1,7 +1,14 @@
+from selenium.webdriver.common.by import By
+import cassandraSent as bd
 import PyPDF2
 import uuid
-import cassandraSent as bd
 import base64
+import time
+import json
+import os
+import sys
+
+download_dir='C:\\Users\\1098350515\\Downloads'
 
 
 def appendInfoToFile(path,filename,strcontent):
@@ -9,7 +16,7 @@ def appendInfoToFile(path,filename,strcontent):
     txtFile.write(strcontent)
     txtFile.close()
 
-def processRow(browser,download_dir,row):
+def processRow(browser,strSearch,row):
     pdfDownloaded=False
     for col in range(1,8):
         if col<7:
@@ -66,6 +73,7 @@ def processRow(browser,download_dir,row):
                 #Check if a pdf exists                       
                 #json_sentencia['lspdfcontent'].clear()
                 json_sentencia['pdfcontent']=''
+                bContent=''
                 strContent=''
                 contFile=''
                 for file in os.listdir(download_dir):
@@ -77,8 +85,8 @@ def processRow(browser,download_dir,row):
                         pags=pdfReader.numPages
                         for x in range(0,pags):
                             pageObj = pdfReader.getPage(x)
-                            strContent=pageObj.extractText().encode('utf-8')
-                            cont64=base64.b64encode(strContent)
+                            bContent=pageObj.extractText().encode('utf-8')
+                            cont64=base64.b64encode(bContent)
                             contFile=contFile+str(cont64)                              
                         pdfFileObj.close()
                            
@@ -96,7 +104,6 @@ def processRow(browser,download_dir,row):
                 else:
                     print('Keep going...sentencia existed:',str(fileNumber)) 
                     
-                countRow=countRow+1
                 browser.close()
                 browser.switch_to_window(main_window)    
 

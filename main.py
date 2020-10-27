@@ -10,8 +10,8 @@ import chromedriver_autoinstaller
 import json
 import time
 import os
-import requests 
 import sys
+import requests
 
 
 pathToHere=os.getcwd()
@@ -102,10 +102,8 @@ if status==200:
         jsonPag=json_control['pag']
         print('Page from json control:',str(jsonPag))
         for row in range(0,20):
-            tool.processRow(browser,download_dir,row)   
+            tool.processRow(browser,strSearch,row)   
 
-        #Page identention
-        print('Count of Rows:',str(countRow)) 
         #Update the info in file
         infoPage=str(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text)
         data=infoPage.split(' ')
