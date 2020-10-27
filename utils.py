@@ -74,7 +74,6 @@ def processRow(browser,strSearch,row):
                 #json_sentencia['lspdfcontent'].clear()
                 json_sentencia['pdfcontent']=''
                 bContent=''
-                strContent=''
                 contFile=''
                 for file in os.listdir(download_dir):
                     pdfDownloaded=True
@@ -93,7 +92,7 @@ def processRow(browser,strSearch,row):
                 #When pdf is done and the record is in cassandra, delete all files in download folder
                 #If the pdf is not downloaded but the window is open, save the data without pdf
                 if pdfDownloaded==True:
-                    json_sentencia['pdfcontent']=contFile
+                    json_sentencia['pdfcontent']=str(contFile).encode('base64')
                     for file in os.listdir(download_dir):
                         os.remove(download_dir+'\\'+file) 
 
