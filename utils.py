@@ -7,6 +7,7 @@ import time
 import json
 import os
 import sys
+import codecs
 
 download_dir='C:\\Users\\1098350515\\Downloads'
 
@@ -71,24 +72,20 @@ def processRow(browser,strSearch,row):
                 json_sentencia['subject']=subject
                 json_sentencia['summary']=str(summary).replace("'"," ")    
                 #Check if a pdf exists                       
-                #json_sentencia['lspdfcontent'].clear()
-                json_sentencia['pdfcontent']=''
-                content=''
+                json_sentencia['lspdfcontent'].clear()
+                lsContent=[]
                 for file in os.listdir(download_dir):
                     pdfDownloaded=True
                     strFile=file.split('.')[1]
                     if strFile=='PDF' or strFile=='pdf':
-                        #This procedure produces a b'blabla' string, it has UTF-8
-                        #PDF files are stored as bytes. Therefore to read or write a PDF file you need to use rb or wb.
-                        content=readPyPDF(file)
-                        bcontent=base64.b64encode(bytes(content))
-                        print(bcontent.decode('utf-8'))
-                        
-                           
+                        #content is string
+                        lsContent=readPyPDF(file)
+       
                 #When pdf is done and the record is in cassandra, delete all files in download folder
                 #If the pdf is not downloaded but the window is open, save the data without pdf
                 if pdfDownloaded==True:
-                    json_sentencia['pdfcontent']=''
+                    for item in lsContent:
+                        json_sentencia['lspdfcontent'].append(item)
                     for file in os.listdir(download_dir):
                         os.remove(download_dir+'\\'+file) 
 
@@ -107,22 +104,36 @@ def processRow(browser,strSearch,row):
                 browser.quit()
                 sys.exit(0)  
 
-
-def base64toNormalText(encoded):
-    data = base64.b64decode(encoded) 
-    print(data.decode('utf-8'))  
+ 
 
 def readPyPDF(file):
-    content=''
-    fileContent=''
+    #This procedure produces a b'blabla' string, it has UTF-8
+    #PDF files are stored as bytes. Therefore to read or write a PDF file you need to use rb or wb.
+    lsContent=[]
     pdfFileObj = open(download_dir+'\\'+file, 'rb')
     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
     pags=pdfReader.numPages
     for x in range(0,pags):
         pageObj = pdfReader.getPage(x)
         #UTF-8 is the right encodeing, I tried ascii and didn't work
-        bcontent=pageObj.extractText().encode('utf-8') 
-        content=base64.b64encode(bcontent)
-        fileContent=fileContent+str(content)                        
+        #1. bContent is the actual byte from pdf with utf-8, expected b'bla...'
+        bcontent=base64.b64encode(pageObj.extractText().encode('utf-8'))
+        lsContent.append(str(bcontent.decode('utf-8')))
+                         
     pdfFileObj.close()    
-    return fileContent
+    return lsContent
+
+"""
+This is the method to call when fetching the pdf enconded from cassandra which is a list of text
+but that text is really bytes.
+"""
+def decodeFromBase64toNormalTxt(b64content):
+    normarlText=base64.b64decode(b64content).decode('utf-8')
+    return normarlText
+    
+    
+
+
+    
+
+
