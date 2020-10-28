@@ -73,26 +73,21 @@ def processRow(browser,strSearch,row):
                 #Check if a pdf exists                       
                 #json_sentencia['lspdfcontent'].clear()
                 json_sentencia['pdfcontent']=''
-                bContent=''
                 contFile=''
                 for file in os.listdir(download_dir):
                     pdfDownloaded=True
                     strFile=file.split('.')[1]
                     if strFile=='PDF' or strFile=='pdf':
-                        pdfFileObj = open(download_dir+'\\'+file, 'rb')
-                        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-                        pags=pdfReader.numPages
-                        for x in range(0,pags):
-                            pageObj = pdfReader.getPage(x)
-                            bContent=pageObj.extractText().encode('utf-8')
-                            cont64=base64.b64encode(bContent)
-                            contFile=contFile+str(cont64)                              
-                        pdfFileObj.close()
+                        #This procedure produces a b'blabla' string, it has UTF-8
+                        #PDF files are stored as bytes. Therefore to read or write a PDF file you need to use rb or wb.
+                        with open(download_dir+'\\'+file, "r",encoding='utf-8') as pdf_file:
+                            contFile=base64.b64decode(pdf_file.read())
                            
                 #When pdf is done and the record is in cassandra, delete all files in download folder
                 #If the pdf is not downloaded but the window is open, save the data without pdf
                 if pdfDownloaded==True:
-                    json_sentencia['pdfcontent']=str(contFile).encode('base64')
+                    base64toNormalText(contFile)
+                    json_sentencia['pdfcontent']=contFile
                     for file in os.listdir(download_dir):
                         os.remove(download_dir+'\\'+file) 
 
@@ -109,4 +104,9 @@ def processRow(browser,strSearch,row):
             else:
                 print('The pdf window was not opened',strSearch)
                 browser.quit()
-                sys.exit(0)        
+                sys.exit(0)  
+
+
+def base64toNormalText(encoded):
+    data = base64.b64decode(encoded) 
+    print(data.decode('utf-8'))  
