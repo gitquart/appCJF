@@ -8,7 +8,7 @@
     #First row, first column: //*[@id="grdSentencias_ctl00__0"]/td[1]
     #find_elements_by_xpath will ALWAYS return a list
     #Get the page value and next click button
-    
+    ffff
     #PageTotal=int(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00_ctl03_ctl01_PageSizeComboBox_Input"]').get_attribute('value'))
     #infoPag=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text
     #data=infoPag.split(' ')

@@ -7,7 +7,6 @@ import time
 import json
 import os
 import sys
-import codecs
 
 download_dir='C:\\Users\\1098350515\\Downloads'
 
