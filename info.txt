@@ -32,4 +32,4 @@
     #Next set of pages from page 2 (Right ...)  //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]
     #Prior set of pages from page 2 to 100 (Left ...) //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[2]/a[1]
 
-    //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]/strong[1]bbbb
+    //*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]/strong[1]
