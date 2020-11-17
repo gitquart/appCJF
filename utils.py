@@ -10,7 +10,6 @@ import os
 import sys
 
 download_dir='C:\\Users\\1098350515\\Downloads'
-done=False
 
 def appendInfoToFile(path,filename,strcontent):
     txtFile=open(path+filename,'a+')
@@ -153,48 +152,48 @@ def processPDF(json_sentencia,lsRes):
             json_documento['documento']=json_sentencia['filenumber']
             json_documento['fuente']='cjf'
             totalElements=len(lsContent)
-            insertPDFChunks(0,0,0,totalElements,lsContent,json_documento)       
+            result=insertPDFChunks(0,0,0,totalElements,lsContent,json_documento,0)
+            if result==False:
+                print('PDF Ended!')       
            
         
-def insertPDFChunks(startPos,contador,secuencia,totalElements,lsContent,json_documento):
-    done=False
-    json_documento['lspdfcontent'].clear()
-    json_documento['id']=str(uuid.uuid4())
-    for i in range(startPos,totalElements):
-        if done:
-            break
-        if i!=totalElements-1:
-            if contador<=20:
-                json_documento['lspdfcontent'].append(lsContent[i])
-                contador=contador+1
+def insertPDFChunks(startPos,contador,secuencia,totalElements,lsContent,json_documento,done):
+    if done==0:
+        json_documento['lspdfcontent'].clear()
+        json_documento['id']=str(uuid.uuid4())
+        for i in range(startPos,totalElements):
+            if i!=totalElements-1:
+                if contador<=20:
+                    json_documento['lspdfcontent'].append(lsContent[i])
+                    contador=contador+1
+                else:
+                    currentSeq=secuencia+1
+                    json_documento['secuencia']=currentSeq
+                    res=bd.insertPDF(json_documento) 
+                    if res:
+                        print('Chunk of pdf added:',str(i),'from ',str(totalElements),' sequence:',str(currentSeq))  
+                    else:
+                        print('Chunk of pdf already existed:',str(i),'from ',str(totalElements),' sequence:',str(currentSeq)) 
+
+                    return insertPDFChunks(i,0,currentSeq,totalElements,lsContent,json_documento,0) 
             else:
+                json_documento['lspdfcontent'].append(lsContent[i])
                 currentSeq=secuencia+1
                 json_documento['secuencia']=currentSeq
                 res=bd.insertPDF(json_documento) 
                 if res:
-                    print('Chunk of pdf added:',str(i),'from ',str(totalElements),' sequence:',str(currentSeq))  
+                    print('Last Chunk of pdf added:',str(i),'from ',str(totalElements),' sequence:',str(currentSeq))
                 else:
-                    print('Chunk of pdf already existed:',str(i),'from ',str(totalElements),' sequence:',str(currentSeq)) 
+                    print('Last Chunk of pdf already existed:',str(i),'from ',str(totalElements),' sequence:',str(currentSeq))
 
-                insertPDFChunks(i,0,currentSeq,totalElements,lsContent,json_documento) 
-        else:
-            json_documento['lspdfcontent'].append(lsContent[i])
-            currentSeq=secuencia+1
-            json_documento['secuencia']=currentSeq
-            res=bd.insertPDF(json_documento) 
-            if res:
-                print('Last Chunk of pdf added:',str(i),'from ',str(totalElements),' sequence:',str(currentSeq))
-            else:
-                print('Last Chunk of pdf already existed:',str(i),'from ',str(totalElements),' sequence:',str(currentSeq)) 
-            done=True        
-            break     
+                return  insertPDFChunks(i,0,currentSeq,totalElements,lsContent,json_documento,1)
+    else:
+        return False            
+
+                             
 
 
-    
-
-           
-       
-                    
+                
 
 def readPyPDF(file):
     #This procedure produces a b'blabla' string, it has UTF-8
