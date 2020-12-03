@@ -9,15 +9,21 @@ cloud_config= {
         'secure_connect_bundle': pathToHere+'\\secure-connect-dbtest.zip'
     }
 keyspace='test'    
+
+def getCluster():
+    #Connect to Cassandra
+    objCC=CassandraConnection()
+    auth_provider = PlainTextAuthProvider(objCC.cc_user_test,objCC.cc_pwd_test)
+    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+
+    return cluster
+
               
 def cassandraBDProcess(json_sentencia):
      
     sent_added=False
 
-    #Connect to Cassandra
-    objCC=CassandraConnection()
-    auth_provider = PlainTextAuthProvider(objCC.cc_user_test,objCC.cc_pwd_test)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster=getCluster()
     session = cluster.connect()
     session.default_timeout=70
     row=''
@@ -52,11 +58,7 @@ def cassandraBDProcess(json_sentencia):
     return lsRes
 
 def updatePage(page):
-
-    #Connect to Cassandra
-    objCC=CassandraConnection()
-    auth_provider = PlainTextAuthProvider(objCC.cc_user_test,objCC.cc_pwd_test)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster=getCluster()
     session = cluster.connect()
     session.default_timeout=70
     page=str(page)
@@ -67,11 +69,7 @@ def updatePage(page):
     return True
 
 def getPageAndTopic():
-
-    #Connect to Cassandra
-    objCC=CassandraConnection()
-    auth_provider = PlainTextAuthProvider(objCC.cc_user_test,objCC.cc_pwd_test)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster=getCluster()
     session = cluster.connect()
     session.default_timeout=70
     row=''
@@ -96,11 +94,7 @@ def getPageAndTopic():
 def insertPDF(json_doc):
      
     record_added=False
-
-    #Connect to Cassandra
-    objCC=CassandraConnection()
-    auth_provider = PlainTextAuthProvider(objCC.cc_user_test,objCC.cc_pwd_test)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster=getCluster()
     session = cluster.connect()
     session.default_timeout=100
 
