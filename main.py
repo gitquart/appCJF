@@ -84,12 +84,12 @@ if status==200:
             if times==1:
                 SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
                 time.sleep(5)
-                btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
+                btnBuscaTema=browser.find_elements_by_xpath('//*[@id="btnBuscarPorTema_input"]')[0].click()
                 time.sleep(5)
             else:
                 SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]")[0].click()
                 time.sleep(5)
-                btnBuscaTema=browser.find_elements_by_id('btnBuscarPorTema')[0].click()
+                btnBuscaTema=browser.find_elements_by_xpath('//*[@id="btnBuscarPorTema_input"]')[0].click()
                 time.sleep(5)
 
     #Rest for 10 seconds just to slow down
