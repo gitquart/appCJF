@@ -71,6 +71,8 @@ if status==200:
     time.sleep(20)
     if startPage<=10:
         #Mechanism no failure
+        for i in range(1,startPage+1):
+            SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]")[0].click()
         btnBuscaTema=browser.find_elements_by_xpath('//*[@id="btnBuscarPorTema_input"]')[0].click()
         #End of non failire mechanism
 
