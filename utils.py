@@ -11,6 +11,15 @@ import sys
 
 download_dir='C:\\Users\\1098350515\\Downloads'
 
+def devuelveElemento(xPath, browser):
+    cEle=0
+    while (cEle==0):
+        cEle=len(browser.find_elements_by_xpath(xPath))
+        if cEle>0:
+            ele=browser.find_elements_by_xpath(xPath)[0]
+
+    return ele
+
 def appendInfoToFile(path,filename,strcontent):
     txtFile=open(path+filename,'a+')
     txtFile.write(strcontent)

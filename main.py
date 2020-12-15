@@ -66,7 +66,8 @@ if status==200:
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
     strSearch=topic
     txtBuscar= browser.find_elements_by_id('txtTema')[0].send_keys(strSearch)
-    btnBuscaTema=browser.find_elements_by_xpath('//*[@id="btnBuscarPorTema_input"]')[0].click()
+    btnBuscaTema=tool.devuelveElemento('//*[@id="btnBuscarPorTema_input"]',browser)
+    btnBuscaTema.click()
     #WAit X secs until query is loaded.
     time.sleep(20)
     if startPage<=10:
@@ -74,7 +75,7 @@ if status==200:
         for i in range(1,startPage):
             SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]")[0].click()
             time.sleep(3)
-        btnBuscaTema=browser.find_elements_by_xpath('//*[@id="btnBuscarPorTema_input"]')[0].click()
+        btnBuscaTema.click()
         #End of non failire mechanism
 
     if startPage>10 and startPage<=100:
@@ -87,12 +88,12 @@ if status==200:
             if times==1:
                 SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
                 time.sleep(5)
-                btnBuscaTema=browser.find_elements_by_xpath('//*[@id="btnBuscarPorTema_input"]')[0].click()
+                btnBuscaTema.click()
                 time.sleep(5)
             else:
                 SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]")[0].click()
                 time.sleep(5)
-                btnBuscaTema=browser.find_elements_by_xpath('//*[@id="btnBuscarPorTema_input"]')[0].click()
+                btnBuscaTema.click()
                 time.sleep(5)
 
     #Rest for 10 seconds just to slow down
@@ -118,7 +119,7 @@ if status==200:
         bd.updatePage(control_page)
         #Change the page with next
         btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0].click()
-        btnBuscaTema=browser.find_elements_by_xpath('//*[@id="btnBuscarPorTema_input"]')[0].click()
+        btnBuscaTema.click()
         time.sleep(3) 
 
     if startPage>100:
