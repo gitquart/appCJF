@@ -75,6 +75,7 @@ if status==200:
         for i in range(1,startPage):
             SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]")[0].click()
             time.sleep(3)
+        btnBuscaTema=tool.devuelveElemento('//*[@id="btnBuscarPorTema_input"]',browser)
         btnBuscaTema.click()
         #End of non failire mechanism
 
@@ -88,11 +89,13 @@ if status==200:
             if times==1:
                 SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
                 time.sleep(5)
+                btnBuscaTema=tool.devuelveElemento('//*[@id="btnBuscarPorTema_input"]',browser)
                 btnBuscaTema.click()
                 time.sleep(5)
             else:
                 SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[12]")[0].click()
                 time.sleep(5)
+                btnBuscaTema=tool.devuelveElemento('//*[@id="btnBuscarPorTema_input"]',browser)
                 btnBuscaTema.click()
                 time.sleep(5)
 
@@ -119,6 +122,7 @@ if status==200:
         bd.updatePage(control_page)
         #Change the page with next
         btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0].click()
+        btnBuscaTema=tool.devuelveElemento('//*[@id="btnBuscarPorTema_input"]',browser)
         btnBuscaTema.click()
         time.sleep(3) 
 
