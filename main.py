@@ -61,6 +61,7 @@ if status==200:
     topic=str(lsInfo[0])
     page=str(lsInfo[1])
     startPage=int(page)
+    print('Cassandra info:',str(startPage),'with query:',str(topic))
 
     #class names for li: rtsLI rtsLast
     liBuscar=browser.find_elements_by_xpath("//li[contains(@class,'rtsLI rtsLast')]")[0].click()
@@ -73,10 +74,9 @@ if status==200:
     if startPage<=10:
         #Mechanism no failure
         for i in range(1,startPage):
-            SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]")[0].click()
-            time.sleep(3)
-        btnBuscaTema=tool.devuelveElemento('//*[@id="btnBuscarPorTema_input"]',browser)
-        btnBuscaTema.click()
+            NextSinglePage=tool.devuelveElemento("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]",browser)
+            NextSinglePage.click()  
+            time.sleep(5) 
         #End of non failire mechanism
 
     if startPage>10 and startPage<=100:
@@ -105,11 +105,8 @@ if status==200:
     #Control the page
     #Page identention
     while (startPage<=100):
-        print('Currently on page:',str(startPage),'with query:',str(topic))
-        print('Page from cassandra control:',str(page))
         for row in range(0,20):
             tool.processRow(browser,strSearch,row)   
-
         #Update the info in file
         infoPage=str(browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[5]').text)
         data=infoPage.split(' ')
@@ -121,10 +118,15 @@ if status==200:
         #Edit  control file
         bd.updatePage(control_page)
         #Change the page with next
-        btnnext=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00"]/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]')[0].click()
+        print('Changing page...')
+        #Non failure method: Seems that if first click is searach button it all refreshes
         btnBuscaTema=tool.devuelveElemento('//*[@id="btnBuscarPorTema_input"]',browser)
         btnBuscaTema.click()
-        time.sleep(3) 
+        time.sleep(3)
+        NextSinglePage=tool.devuelveElemento("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[3]/input[1]",browser)
+        NextSinglePage.click()
+        #End non ailure method
+        time.sleep(5) 
 
     if startPage>100:
         print('Done with query: ',topic, ' . Please change topic')  
