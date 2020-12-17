@@ -82,10 +82,10 @@ if status==200:
     if startPage>10 and startPage<=100:
         if startPage>90:
             ten=10
-        else:    
-            ten=str(startPage)
-            ten=int(ten[0])+1
-            dec=int(ten[1])+1
+        else: 
+            strStartPage=str(startPage)   
+            ten=int(strStartPage[0])+1
+            dec=int(strStartPage[1])+1
         for times in range(1,ten):
             if times==1:
                 SectionNextPages=browser.find_elements_by_xpath("//*[@id='grdSentencias_ctl00']/tfoot/tr/td/table/tbody/tr/td/div[2]/a[11]")[0].click()
