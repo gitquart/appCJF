@@ -8,6 +8,9 @@ import time
 import json
 import os
 import sys
+from InternalControl import cInternalControl
+
+objControl= cInternalControl()
 
 download_dir='C:\\Users\\1098350515\\Downloads'
 
@@ -26,7 +29,6 @@ def appendInfoToFile(path,filename,strcontent):
     txtFile.close()
 
 def processRow(browser,strSearch,row):
-    pdfDownloaded=False
     for col in range(1,8):
         if col<7:
             if col==1:
@@ -42,7 +44,29 @@ def processRow(browser,strSearch,row):
                 summary=summary=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text
                 str(summary).replace("'"," ")
             if col==6:
-                date=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text                    
+                date=browser.find_elements_by_xpath('//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']')[0].text 
+        else:
+            if (objControl.pdfOn):
+                #This is the xpath of the link : //*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a
+                #This find_element method works!
+                link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
+                link.click()
+                #Wait until the second window is open and the pdf is downloaded (or not downloaded)
+                time.sleep(20)
+                if len(browser.window_handles)>1:
+                    #window_handles changes always
+                    #If the pdf browser page opens, then the record should be done in Cassandra
+                    main_window=browser.window_handles[0]
+                    pdf_window=browser.window_handles[1]
+                    browser.switch_to_window(pdf_window)
+                    browser.close()
+                    browser.switch_to_window(main_window)
+                else:
+                    print('The pdf window was not opened',strSearch)
+                    browser.quit()
+                    sys.exit(0)  
+            else:
+                print('PDF is turned off now, skiping pdf download and processing for it...')                                      
 
     #Except: Code withoud pdf
     #Build the json by row            
@@ -71,42 +95,12 @@ def processRow(browser,strSearch,row):
         print('Sentencia added:',str(fileNumber))
     else:
         print('Keep going...sentencia existed:',str(fileNumber))
+    
+    if (objControl.pdfOn):
+        for file in os.listdir(download_dir):
+            processPDF(json_sentencia,lsRes)
+            os.remove(download_dir+'\\'+file)    
 
-            #End Except: Code withoud pdf    
-        """
-        else:
-            #This is the xpath of the link : //*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a
-            #This find_element method works!
-            link=browser.find_element(By.XPATH,'//*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a')
-            link.click()
-            #Wait until the second window is open and the pdf is downloaded (or not downloaded)
-            time.sleep(20)
-            if len(browser.window_handles)>1:
-                #window_handles changes always
-                #If the pdf browser page opens, then the record should be done in Cassandra
-                main_window=browser.window_handles[0]
-                pdf_window=browser.window_handles[1]
-                browser.switch_to_window(pdf_window)
-
-                #Something goes here
-
-                browser.close()
-                browser.switch_to_window(main_window)
-
-            else:
-                print('The pdf window was not opened',strSearch)
-                browser.quit()
-                sys.exit(0)     
-        """        
-                
-                #Here goes "Except: Code withoud pdf"
-
-                #Check if a pdf exists  
-                                     
-                #for file in os.listdir(download_dir):
-                #    pdfDownloaded=True
-                #    processPDF(json_sentencia,lsRes)
-                #    os.remove(download_dir+'\\'+file)
                     
 
 """
